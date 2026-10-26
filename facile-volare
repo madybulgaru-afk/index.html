@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facile Volare - Versione Fiumicino FCO</title>
+  <style>
+    :root {
+      --navy: #0e2a4a;
+      --navy-button: #112d4e;
+      --light-button: #f4f0ea;
+      --text-dark: #0f172a;
+      --text-muted: #475569;
+      --accent-blue: #3b82f6;
+      --success: #22c55e;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #0d1117;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .mobile-frame {
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      max-height: 880px;
+      background: #fdfbf7 url('https://images.unsplash.com/photo-1542296332-2e4473faf563?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.9) 100%);
+      z-index: 1;
+    }
+
+    .app-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 20px;
+    }
+
+    /* BARRA DI PROGRESSO */
+    .top-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-blue);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    .progress-text {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    /* HOME SCREEN */
+    .home-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .subtitle-tag {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 40px;
+    }
+
+    .plane-icon {
+      width: 90px;
+      margin-bottom: 12px;
+    }
+
+    .app-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+    }
+
+    .app-tagline {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .button-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* PULSANTI STILE FOTO */
+    .btn-pill {
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 99px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-pill:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--navy-button);
+      color: white;
+      box-shadow: 0 8px 20px rgba(17, 45, 78, 0.25);
+    }
+
+    .btn-secondary {
+      background: var(--light-button);
+      color: var(--navy);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .btn-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .btn-main-label {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-sub-label {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      font-weight: 400;
+    }
+
+    .arrow-icon {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    /* CONTENUTO GIOCO */
+    .game-screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .screen-heading {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .card-box {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text-dark);
+    }
+
+    .visual-box {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-weight: bold;
+      color: var(--navy);
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .opt-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--navy);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .feedback-notice {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .feedback-notice.correct {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+      display: block;
+    }
+
+    .feedback-notice.incorrect {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<div class="mobile-frame">
+  <div class="overlay"></div>
+  <div class="app-content">
+
+    <!-- HOME SCREEN -->
+    <div id="home-screen" class="home-screen">
+      <div class="subtitle-tag">VERSIONE FIUMICINO FCO</div>
+
+      <div class="logo-container">
+        <!-- SVG Logo esatto dall'immagine -->
+        <svg class="plane-icon" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 35 L45 25 L85 10 C88 9 92 12 90 15 L75 25 L92 27 C94 27 95 29 94 30 L88 35 L65 33 L40 45 L32 45 L42 34 L15 36 Z" fill="#0e2a4a"/>
+          <rect x="15" y="48" width="70" height="4" rx="2" fill="#0e2a4a"/>
+        </svg>
+        <h1 class="app-title">Facile Volare</h1>
+        <p class="app-tagline">Verso il gate, senza stress.</p>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-pill btn-primary" onclick="startGame()">
+          <div class="btn-text">
+            <span class="btn-main-label">GIOCA</span>
+            <span class="btn-sub-label">Fai una prova</span>
+          </div>
+          <span class="arrow-icon">➔</span>
+        </button>
+
+        <button class="btn-pill btn-secondary" onclick="startGame()">
+          <div class="btn-text">
+            <span class="btn-main-label">STO PARTENDO</span>
+            <span class="btn-sub-label">Ti guido fino al gate</span>
+          </div>
+          <span class="arrow-icon">➔</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="game-screen">
+      <div class="top-progress">
+        <div class="progress-track">
+          <div id="progress-bar" class="progress-fill"></div>
+        </div>
+        <span id="progress-text" class="progress-text">14%</span>
+      </div>
+
+      <h2 id="screen-title" class="screen-heading">Hai tutto pronto?</h2>
+
+      <div id="visual-area" class="visual-box" style="display: none;"></div>
+
+      <div id="card-text" class="card-box"></div>
+
+      <div id="options-container" class="options-list"></div>
+
+      <div id="feedback-box" class="feedback-notice"></div>
+
+      <button id="next-btn" class="btn-pill btn-primary" style="margin-top: auto; display: none;" onclick="nextStep()">
+        <div class="btn-text">
+          <span id="next-btn-text" class="btn-main-label">INIZIA</span>
+        </div>
+        <span class="arrow-icon">➔</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const steps = [
+    {
+      title: "Hai tutto pronto?",
+      text: "Hai appena comprato il volo per Barcellona. Ti è arrivata la mail di conferma. Cosa cerchi subito?",
+      visual: null,
+      options: [
+        { text: "Il codice PNR a 6 cifre", correct: true, feedback: "✅ Esatto! È la targa del tuo biglietto per il check-in." },
+        { text: "L'orario del volo", correct: false, feedback: "⛔ Utile, ma per il check-in ti servirà prima il codice PNR!" }
+      ]
+    },
+    {
+      title: "I Documenti",
+      text: "Mancano pochi giorni alla partenza. Quale documento infili in borsa?",
+      visual: null,
+      options: [
+        { text: "Carta d'Identità valida", correct: true, feedback: "✅ Perfetto! Per i voli UE basta la carta d'identità." },
+        { text: "Patente di guida", correct: false, feedback: "⛔ La patente non è valida per l'espatrio!" }
+      ]
+    },
+    {
+      title: "Al Tornello dei Varchi",
+      text: "Sei davanti al lettore ottico del tornello. Come posizioni il telefono?",
+      visual: "📷 LETTORE OTTICO VETRO",
+      options: [
+        { text: "Lo muovo veloce di lato", correct: false, feedback: "⛔ Il lettore non riesce a leggere il codice!" },
+        { text: "Lo appoggio ben fermo sul vetro", correct: true, feedback: "✅ BIP! Luce verde e si passa al volo." }
+      ]
+    },
+    {
+      title: "Ai Controlli: Tasche",
+      text: "L'addetto alla sicurezza ti dice: 'Svuotare le tasche'. Cosa lasci dentro?",
+      visual: null,
+      options: [
+        { text: "NIENTE! Tasche vuote = ZERO oggetti", correct: true, feedback: "✅ Bravissima! Nemmeno sigarette, caramelle o monete." },
+        { text: "Solo il telefono e le chiavi", correct: false, feedback: "⛔ Tutto va tolto e messo nella giacca o nello zaino!" }
+      ]
+    },
+    {
+      title: "La Vaschetta Perfetta",
+      text: "Come usi la vaschetta prima del nastro RX?",
+      visual: "📥 POSTAZIONE VASCHETTE",
+      options: [
+        { text: "La riempio sul piano, poi la spingo sui rulli", correct: true, feedback: "✅ Perfetto! Piatto, ordinato e senza piramidi." },
+        { text: "La appoggio subito sui rulli in movimento", correct: false, feedback: "⛔ Mai sui rulli finché non hai finito di riempirla!" }
+      ]
+    },
+    {
+      title: "Il Tabellone Partenze",
+      text: "Vedi due voli per Barcellona alle 15:30. Il tuo biglietto dice VY6107. Quale gate cerchi?",
+      visual: "15:30 BARCELLONA VY6107 -> GATE A12",
+      options: [
+        { text: "Gate A12 (Corrisponde a VY6107)", correct: true, feedback: "✅ Esatto! Guarda sempre il numero di volo esatto." },
+        { text: "Gate B04 (Va comunque a Barcellona)", correct: false, feedback: "⛔ Quello è il volo di un'altra compagnia!" }
+      ]
+    },
+    {
+      title: "Sei al gate.",
+      text: "Hai fatto tutto quello che serviva. Ora sai come arrivare fin qui senza stress!",
+      visual: null,
+      options: []
+    }
+  ];
+
+  let currentStep = 0;
+
+  function startGame() {
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'flex';
+    currentStep = 0;
+    renderStep();
+  }
+
+  function renderStep() {
+    const data = steps[currentStep];
+    const pct = Math.round(((currentStep + 1) / steps.length) * 100);
+
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = pct + '%';
+    document.getElementById('screen-title').innerText = data.title;
+    document.getElementById('card-text').innerText = data.text;
+
+    const visualArea = document.getElementById('visual-area');
+    if (data.visual) {
+      visualArea.style.display = 'block';
+      visualArea.innerText = data.visual;
+    } else {
+      visualArea.style.display = 'none';
+    }
+
+    document.getElementById('feedback-box').className = 'feedback-notice';
+    document.getElementById('feedback-box').style.display = 'none';
+
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.style.display = 'none';
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    if (data.options.length === 0) {
+      // Schermata Finale
+      document.getElementById('next-btn-text').innerText = "SONO PRONTO";
+      nextBtn.style.display = 'flex';
+      nextBtn.onclick = () => {
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('home-screen').style.display = 'flex';
+      };
+      return;
+    }
+
+    data.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-card';
+      btn.innerText = opt.text;
+      btn.onclick = () => selectOption(opt);
+      container.appendChild(btn);
+    });
+  }
+
+  function selectOption(opt) {
+    const box = document.getElementById('feedback-box');
+    box.innerText = opt.feedback;
+
+    if (opt.correct) {
+      box.className = 'feedback-notice correct';
+      document.getElementById('next-btn-text').innerText = "AVANTI";
+      document.getElementById('next-btn').style.display = 'flex';
+      document.getElementById('next-btn').onclick = nextStep;
+    } else {
+      box.className = 'feedback-notice incorrect';
+    }
+  }
+
+  function nextStep() {
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+      renderStep();
+    }
+  }
+</script>
+
+</body>
+</html>
